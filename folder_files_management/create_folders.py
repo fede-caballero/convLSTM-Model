@@ -34,10 +34,10 @@ def crear_carpetas_mdv(ruta_base):
 
 def main():
     # Ruta específica de tu carpeta
-    campaña = "2016-2017"
-    carpeta_base = "20170329"
-    ruta_especifica = f"/home/f-caballero/UM/TIF3/Tesis/MDV/Selected/{campaña}/{carpeta_base}"
-    
+    campaña = "2019-2020"
+    carpeta_base = "20200203"
+    ruta_especifica = f"/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/MDV/Selected/{campaña}/{carpeta_base}"
+
     print(f"Procesando carpeta: {ruta_especifica}")
     print(f"Buscando archivos .mdv...")
     
