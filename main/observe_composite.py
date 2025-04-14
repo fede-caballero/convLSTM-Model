@@ -1,57 +1,78 @@
-# 1. Instalar y cargar librerías necesarias
-import os
-import glob
-import numpy as np
-import pyart
 import matplotlib.pyplot as plt
+import pyart
+import numpy as np
+import os
+import netCDF4
+import glob
+import geopandas as gpd
 
-# 2. Función para leer .mdv y calcular el composite
-def get_composite_from_mdv(filename):
-    # Leer el archivo .mdv
+def read_mdv_to_nc(filename):
     radar = pyart.io.read_grid_mdv(filename)
-    reflectivity = radar.fields['reflectivity']['data'].filled(np.nan)  # (36, 1000, 1000)
-    
-    # Calcular el composite (máximo a lo largo de la dimensión vertical, eje 0)
-    composite = np.nanmax(reflectivity, axis=0)  # (1000, 1000)
-    
-    # Depuración: Ver valores extremos y NaN
-    print(f"Archivo: {filename}")
-    print(f"Mínimo en composite: {np.nanmin(composite)} dBZ")
-    print(f"Máximo en composite: {np.nanmax(composite)} dBZ")
-    print(f"NaN count en composite: {np.isnan(composite).sum()}")
-    
-    return composite
+    return radar
 
-# 3. Función para visualizar el composite
-def plot_composite(composite, filename):
-    plt.figure(figsize=(8, 6))
-    plt.imshow(composite, cmap='jet', vmin=-30, vmax=70)  # Rango típico de dBZ
+def convert_mdv_nc(radar, output_folder, output_filename):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    full_path = os.path.join(output_folder, output_filename)
+    if not os.path.isfile(full_path):
+        radar.write(full_path, format='NETCDF4')
+
+    data = netCDF4.Dataset(full_path)
+    return data
+
+def process_mdv_file(filename):
+    radar = read_mdv_to_nc(filename=filename)
+    
+    output_folder = './nc_files'
+    output_filename = os.path.basename(filename).replace('.mdv', '.nc')
+    
+    data = convert_mdv_nc(radar, output_folder, output_filename)
+    
+    reflectivity = data['reflectivity'][0,:,:,:]  # Extraer datos y eliminar dimensión extra
+    reflectivity = reflectivity.filled(np.nan)  # Convertir a array con NaNs
+    
+    return reflectivity
+
+def plot_composite(composite, filename, gis_overlay):
+    plt.figure(figsize=(10, 8))
+    
+    composite_corrected = np.flipud(composite)
+    
+    plt.imshow(composite_corrected, cmap='jet', interpolation='none', vmin=-30, vmax=70)
+    plt.title(f'Composite - {os.path.basename(filename)}', fontsize=14)
     plt.colorbar(label='Reflectividad (dBZ)')
-    plt.title(f"Composite - {os.path.basename(filename)}")
-    plt.xlabel('X (píxeles)')
-    plt.ylabel('Y (píxeles)')
+    
+    if gis_overlay is not None:
+        gis_overlay.plot(ax=plt.gca(), color='black', linewidth=1)
+
+    plt.text(0.02, 0.98, 'N', transform=plt.gca().transAxes, fontsize=12, verticalalignment='top')
+    plt.text(0.98, 0.02, 'S', transform=plt.gca().transAxes, fontsize=12, horizontalalignment='right')
+    plt.text(0.02, 0.02, 'W', transform=plt.gca().transAxes, fontsize=12)
+    plt.text(0.98, 0.98, 'E', transform=plt.gca().transAxes, fontsize=12, 
+        horizontalalignment='right', verticalalignment='top')
+
     plt.show()
 
-# 4. Recorrer archivos .mdv directamente en la carpeta
-ruta_base = 'D:\\Fede Facultad\\tesis\\MDV\\20211011'  # Ruta ajustada para Windows
+def process_folder(folder_path, gis_file):
+    gis_overlay = None
+    if gis_file:
+        gis_overlay = gpd.read_file(gis_file)
+    
+    mdv_files = sorted(glob.glob(os.path.join(folder_path, '*.mdv')))
 
-print(f"Buscando en: {ruta_base}")
-if os.path.exists(ruta_base):
-    print("Carpeta encontrada. Contenido:", os.listdir(ruta_base))
-else:
-    print("Error: Carpeta no encontrada. Verifica la ruta.")
-    exit()
+    
+    for file in mdv_files:
+        print(f"Procesando archivo: {file}")
+        reflectivity = process_mdv_file(file)
+        
+        # Crear y mostrar el composite
+        threshold = 0  # Ajusta este valor según sea necesario
+        masked_reflectivity = np.where(reflectivity < threshold, np.nan, reflectivity)
+        composite = np.nanmax(masked_reflectivity, axis=0)
+        plot_composite(composite, file, gis_overlay)
 
-# Listar todos los archivos .mdv en la carpeta
-mdv_files = sorted(glob.glob(os.path.join(ruta_base, "*.mdv")))
-print(f"Archivos .mdv encontrados: {mdv_files}")
-
-# Procesar y visualizar cada archivo .mdv
-for mdv_file in mdv_files:
-    try:
-        composite = get_composite_from_mdv(mdv_file)
-        plot_composite(composite, mdv_file)
-    except Exception as e:
-        print(f"Error al procesar {mdv_file}: {e}")
-
-print("Procesamiento completado.")
+# Uso del script
+folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main'
+gis_file = '/home/f-caballero/UM/TIF3/Argentina.kml'
+process_folder(folder_path, gis_file)

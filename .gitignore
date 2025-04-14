@@ -172,3 +172,26 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Archivos temporales de Excel
+~$*.xlsx
+*.lock.*
+
+# Archivos de entorno virtual (radar es tu venv, parece)
+radar/
+
+# Archivos de datos intermedios que no querés versionar
+nc_files/
+
+# Archivos personales o temporales
+*.tmp
+*.bak
+*.swp
+*.swo
+*.log
+
+# Archivos adicionales que aparecieron como untracked
+data_analysis/Observations/Sorted/.~lock.*
+
+# Archivos para jupyter/colab/debug
+main/for_jupypter.py
