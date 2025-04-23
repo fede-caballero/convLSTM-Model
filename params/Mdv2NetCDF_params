@@ -1,0 +1,7 @@
+// Mdv2NetCDF parameters
+use_output_filename = TRUE;    // Usa el nombre especificado en output_filename
+output_filename = "";          // Dejar vacio, se especificara en el script
+output_dir = ".";              // Directorio relativo
+file_format = NETCDF4_CLASSIC; // Formato NetCDF
+compress_data = TRUE;          // Comprimir datos
+compression_level = 4;         // Nivel de compresion
