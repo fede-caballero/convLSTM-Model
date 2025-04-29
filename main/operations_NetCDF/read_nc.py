@@ -1,3 +1,6 @@
+# Este script lee archivos NetCDF, extrae el campo de reflectividad (DBZ),
+# calcula el composite máximo y lo grafica. Se asegura de que los valores NaN se manejen correctamente.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -67,5 +70,5 @@ def process_folder(folder_path):
             plot_composite(composite, file)
 
 # Uso del script
-folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_NetCDF/output'  # Donde está pred_0.nc
+folder_path = '/home/f-caballero/UM/netCDF_Big_sample/201510293' 
 process_folder(folder_path)

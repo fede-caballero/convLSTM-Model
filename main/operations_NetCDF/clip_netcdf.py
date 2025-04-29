@@ -1,3 +1,6 @@
+# En este archivo lo que se hace es dejar en un rango maximo de reflectividad para estandarizar los datos.
+# No voy a estandarizar los nc ya que el rango de reflectividad que voy a usar para el modelo es -30 a 70.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os

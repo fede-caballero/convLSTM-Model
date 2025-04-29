@@ -1,3 +1,6 @@
+# Este script lee archivos NetCDF y extrae la variable DBZ.
+# Se espera que la variable DBZ tenga la forma (1, 18, 500, 500).
+
 import netCDF4 as nc
 import numpy as np
 import glob
@@ -43,5 +46,9 @@ def process_netcdf_folder(folder_path):
             print(f"No se pudo procesar {file_path}")
 
 # Uso del script
-folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_NetCDF/output'
+folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2015101410'
 process_netcdf_folder(folder_path)
+folder_path_1 = '/home/f-caballero/UM/netCDF_Big_sample/2015101410'
+process_netcdf_folder(folder_path_1)
+
+# Comparando las salidas del normalize_netcdf_recover.py con los archivos originales, voy a tener que volver a procesar los datos para que el rango esté entre -30 y 70 dBZ.
