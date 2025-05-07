@@ -46,9 +46,9 @@ def process_netcdf_folder(folder_path):
             print(f"No se pudo procesar {file_path}")
 
 # Uso del script
-folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2015101410'
+folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2020020338/'
 process_netcdf_folder(folder_path)
-folder_path_1 = '/home/f-caballero/UM/netCDF_Big_sample/2015101410'
-process_netcdf_folder(folder_path_1)
+#folder_path_1 = '/home/f-caballero/UM/netCDF_Big_sample/2015101410'
+#process_netcdf_folder(folder_path_1)
 
 # Comparando las salidas del normalize_netcdf_recover.py con los archivos originales, voy a tener que volver a procesar los datos para que el rango esté entre -30 y 70 dBZ.
