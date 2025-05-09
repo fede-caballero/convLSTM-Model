@@ -13,7 +13,7 @@ input_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netC
 output_base_dir = "/home/f-caballero/UM/netCDF_Big_sample_new_range"
 log_file = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/logs/normalize_log_new_range.txt"
 
-# Crear archivo de log y directorio de salida
+# Crear archivo de log y directorio de salida5
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 os.makedirs(output_base_dir, exist_ok=True)
 with open(log_file, 'w') as f:
