@@ -196,6 +196,8 @@ data_analysis/Observations/Sorted/.~lock.*
 # Archivos para jupyter/colab/debug
 main/for_jupypter.py
 
+# Archivos de modelos pytorch
+*.pth
 # Archivos netCDF
 *.nc
 
