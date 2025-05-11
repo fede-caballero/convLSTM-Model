@@ -231,8 +231,10 @@ if __name__ == "__main__":
     )
 
     # --- CAMBIA ESTA RUTA a donde tengas tu archivo .pth guardado ---
-    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/jupyter_notebooks/GeminiModels/Salidas modelo andando/best_convlstm_model.pth" # O el checkpoint que quieras
+    # model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/jupyter_notebooks/GeminiModels/Salidas modelo andando/best_convlstm_model.pth" # O el checkpoint que quieras
     
+    # Modelo con 5 épocas y 80 batches 
+    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Model_5_Epochs_80_Batches/checkpoint_epoch_5.pth"
     if not os.path.exists(model_path):
         print(f"Error: Archivo de modelo no encontrado en {model_path}")
         exit()
@@ -251,13 +253,13 @@ if __name__ == "__main__":
     # --- CAMBIA ESTAS RUTAS a tus 6 archivos NetCDF de entrada para la nueva predicción ---
     # Deben estar en orden cronológico.
     input_nc_files_for_prediction = [
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/031140.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/031459.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/031818.nc",
-        # Para la prueba, seq_len fue 3. Si tu modelo se entrenó con seq_len=3:
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/032137.nc", # Comentar si seq_len fue 3
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/032457.nc", # Comentar si seq_len fue 3
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/first_try_nc/201510299/032817.nc", # Comentar si seq_len fue 3
+        #Modelo entrenado con 6 archivos de entrada
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200230.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200535.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200837.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/201141.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/201748.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/202052.nc", 
     ]
     # Ajusta la longitud de esta lista a la 'seq_len' con la que se entrenó el modelo cargado.
     # Si el modelo se entrenó con seq_len=3 (como en la última config de prueba):
