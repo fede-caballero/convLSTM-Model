@@ -46,7 +46,7 @@ def process_netcdf_folder(folder_path):
             print(f"No se pudo procesar {file_path}")
 
 # Uso del script
-folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2020020338/'
+folder_path = '/home/f-caballero/UM/Backup-convLSTM/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201702255'
 process_netcdf_folder(folder_path)
 #folder_path_1 = '/home/f-caballero/UM/netCDF_Big_sample/2015101410'
 #process_netcdf_folder(folder_path_1)

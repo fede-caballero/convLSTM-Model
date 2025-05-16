@@ -4,13 +4,13 @@ import numpy as np # Necesitarás numpy para np.max
 
 # --- Rutas a los archivos (¡ASEGÚRATE QUE SEAN CORRECTAS!) ---
 # Archivo de predicción del modelo
-pred_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/prediction_output_20250511_171737.nc"
+pred_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/prediction_output_20250513_142836.nc"
 
 # Archivo objetivo real (el 7mo archivo de la secuencia de validación/prueba correspondiente)
 # Debes identificar cuál es. Ejemplo:
 # Si 'pred_..._sample1.nc' corresponde a la SEGUNDA secuencia en tu 'val_subdirs'
 # y esa subcarpeta es, digamos, '2020020322', y el 7mo archivo es '051030.nc':
-target_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/202052.nc" # <--- ¡CAMBIA ESTO AL REAL!
+target_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Test-Sequence/201511164/122913.nc" # <--- ¡CAMBIA ESTO AL REAL!
 
 # Nombre de la variable de reflectividad en los archivos
 var_name_pred = 'DBZ_forecast' # En tu archivo de predicción

@@ -254,12 +254,12 @@ if __name__ == "__main__":
     # Deben estar en orden cronológico.
     input_nc_files_for_prediction = [
         #Modelo entrenado con 6 archivos de entrada
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200230.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200535.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/200837.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/201141.nc", 
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/201748.nc", 
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201511166/202052.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121051.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121355.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121658.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122002.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122305.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122609.nc", 
     ]
     # Ajusta la longitud de esta lista a la 'seq_len' con la que se entrenó el modelo cargado.
     # Si el modelo se entrenó con seq_len=3 (como en la última config de prueba):

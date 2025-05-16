@@ -26,3 +26,11 @@ foreach folder ($input_base_dir/*)
         end
     endif
 end
+
+# This code converts MDV files to NetCDF format using the Mdv2NetCDF tool.
+# It iterates over folders containing MDV files, creates an output directory for each folder,
+# and converts each MDV file to NetCDF format. The output files are named with a prefix and the original base name.
+# The script also handles errors during conversion and cleans up previous output files.
+# The script is written in tcsh and uses the `foreach` loop to iterate over directories and files.
+# The script assumes that the Mdv2NetCDF tool is available in the system's PATH.
+# The script also creates the output directory if it does not exist and removes any previous output files before conversion.

@@ -2,7 +2,7 @@ import pyart
 import os
 
 # Ruta a uno de los archivos .mdv
-file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/MDV/big_sample/2020020320/040919.mdv"  # Reemplaza con la ruta a uno de tus archivos
+file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operationsMDV/MDV to analyze/025216.mdv"  # Reemplaza con la ruta a uno de tus archivos
 
 # Leer el archivo con Py-ART
 try:
