@@ -63,7 +63,7 @@ class AdvancedMDVReader:
             return results
 
 def main():
-    file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/214452.mdv"
+    file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/MDV/big_sample/201001014/212809.mdv"
     reader = AdvancedMDVReader(file_path)
     
     print("Detalles de Cabecera:")
