@@ -1,0 +1,101 @@
+//======================================================================
+// TDRP params for RadxConvert
+// Converting Cartesian NetCDF (170906.nc) to MDV
+//======================================================================
+
+//----------------------------------------------------------------------
+// Input data
+//  - path_list_path: path to list of input files
+//  - input_dir: input directory
+//    specify -f on command line to override paths
+//----------------------------------------------------------------------
+
+// input_dir = "/path/to/your/netcdf/files"; // No es necesario si usas -f en el script
+// path_list_path = "/dev/null"; // No es necesario si usas -f en el script
+
+//----------------------------------------------------------------------
+// Output data
+//----------------------------------------------------------------------
+
+// Output directory for writing files.
+// Files will be written to this directory.
+// output_dir = "."; // Se especificará con -outdir en el script
+
+// Set the output format.
+// Options:
+//   OUTPUT_FORMAT_CFRADIAL
+//   OUTPUT_FORMAT_DORADE
+//   OUTPUT_FORMAT_MDV_RADIAL  // Para datos radiales a MDV
+//   OUTPUT_FORMAT_MDV         // Para datos grillados/Cartesianos a MDV
+//   OUTPUT_FORMAT_UF
+//   OUTPUT_FORMAT_NETCDF_GENERIC_GRID // Si quisieras generar otro NetCDF Cartesiano
+//   ... y otros
+
+output_format = OUTPUT_FORMAT_MDV;
+
+//----------------------------------------------------------------------
+// Field options
+//----------------------------------------------------------------------
+
+// By default, RadxConvert will try to convert all recognized fields.
+// If you want to explicitly specify which fields to process and how to name them:
+set_output_fields = TRUE;
+output_fields = {
+  {
+    // Nombre del campo en tu archivo NetCDF de entrada (170906.nc)
+    input_field_name = "DBZ";
+    // Nombre que deseas para este campo en el archivo MDV de salida
+    // TITAN a menudo espera "DBZ", "DZ" o nombres estándar similares.
+    output_field_name = "DBZ"; // O "DBZ_F" si TITAN lo prefiere así
+
+    // Opcional: puedes especificar metadatos para el campo de salida
+    // Si no se especifican, RadxConvert intentará copiarlos del NetCDF
+    // o usar defaults sensatos para MDV.
+    // output_units = "dBZ";
+    // output_long_name = "Reflectivity"; // El de tu NetCDF es "DBZ"
+    // output_standard_name = "equivalent_reflectivity_factor"; // El de tu NetCDF es "DBZ"
+
+    // Control sobre la codificación del campo en MDV (opcional)
+    // RadxConvert se encarga de la descompresión/compresión de tu campo DBZ (byte con scale/offset)
+    // output_encoding_type = ENCODING_ASIS; // Intenta mantener la codificación o usa la default de MDV
+    // output_missing_value = -9999.0; // MDV tiene su propio manejo de faltantes
+    // output_scale = 1.0;
+    // output_offset = 0.0;
+  }
+  // Si tuvieras más campos en el NetCDF para convertir, añádelos aquí:
+  // ,
+  // {
+  //   input_field_name = "OtroCampoNetCDF";
+  //   output_field_name = "OTRO_CAMPO_MDV";
+  // }
+};
+
+//----------------------------------------------------------------------
+// Cartesian grid output options
+// Para RadxConvert, si el formato de entrada ya es una malla Cartesiana
+// (como tu NetCDF), generalmente intentará preservar esa geometría
+// al convertir a otro formato Cartesiano como MDV.
+// No necesitas redefinir la malla como en Radx2Grid si solo es conversión.
+//----------------------------------------------------------------------
+
+// override_grid_geometry = FALSE; // Por defecto, debería usar la geometría del input si es compatible
+
+//----------------------------------------------------------------------
+// Metadata options
+// RadxConvert intentará transferir la mayor cantidad de metadatos
+// compatibles (globales y de variables) del NetCDF al MDV.
+// La información de proyección de tu variable grid_mapping_0 es crucial.
+//----------------------------------------------------------------------
+
+// Opción para incluir atributos MDV no estándar en la salida NetCDF (no aplica aquí)
+// netcdf_output_mdv_attributes = FALSE;
+
+// Para la salida MDV, RadxConvert escribirá los metadatos de proyección y campos
+// de manera que sean estándar para el formato MDV.
+
+//----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+// debug = DEBUG_OFF;
+// print_params_read = FALSE;
+// print_params_final = FALSE;

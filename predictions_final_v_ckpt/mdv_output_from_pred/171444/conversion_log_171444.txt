@@ -1,0 +1,64 @@
+====================================================================
+Procesando Archivo: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc
+Salida MDV esperada: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/predictions_final_v_ckpt/mdv_output_from_pred/171444/171444.mdv
+Log detallado en: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/predictions_final_v_ckpt/mdv_output_from_pred/171444/conversion_log_171444.txt
+Timestamp actual: Mon May 19 17:36:15 -03 2025
+--------------------------------------------------------------------
+
+--- Salida de RadxPrint para 171444.nc ---
+--- Fin de RadxPrint ---
+Advertencia: No se pudo extraer el timestamp del nombre de archivo: 171444
+RadxConvert intentará usar el tiempo del archivo NetCDF si está disponible.
+
+--- Ejecutando RadxConvert para 171444.nc ---
+======================================================================
+Program 'RadxConvert'
+Run-time 2025/05/19 20:36:15.
+
+Copyright (c) 1992 - 2025
+University Corporation for Atmospheric Research (UCAR)
+National Center for Atmospheric Research (NCAR)
+Boulder, Colorado, USA.
+
+Redistribution and use in source and binary forms, with
+or without modification, are permitted provided that the following
+conditions are met:
+
+1) Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2) Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3) Neither the name of UCAR, NCAR nor the names of its contributors, if
+any, may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+4) If the software is modified to produce derivative works, such modified
+software should be clearly marked, so as not to confuse it with the
+version available from UCAR.
+
+======================================================================
+Running RadxConvert
+  n input files: 1
+INFO - RadxConvert::Run
+  Input path: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc
+ERROR - RadxConvert::_readFile
+  path: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc
+ERROR - LeoCf2RadxFile::_appendSweepInfo
+  path: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc
+NetCDF: Not a valid ID
+file: /tmp/lrose-build/lrose-core/codebase/libs/Ncxx/src/Ncxx/NcxxDim.cc  line:126
+ERROR - LeoCf2RadxFile::readFromPath
+  Loading sweep info
+ERROR - GenericRadxFile::readFromPath
+  Cannot read path: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc
+
+  ====>> n errors so far: 1
+RadxConvert done
+====>> n good files processed: 0
+ERROR - running RadxConvert
+ERROR: Falla al convertir /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/201001011/171444.nc. Código de salida: 0
+Revisa /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/predictions_final_v_ckpt/mdv_output_from_pred/171444/conversion_log_171444.txt para detalles del error de RadxConvert.
+====================================================================

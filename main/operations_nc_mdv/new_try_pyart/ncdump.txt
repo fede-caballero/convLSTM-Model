@@ -1,0 +1,82 @@
+netcdf \170906 {
+dimensions:
+	time = 1 ;
+	bounds = 2 ;
+	x0 = 500 ;
+	y0 = 500 ;
+	z0 = 18 ;
+variables:
+	double time(time) ;
+		time:standard_name = "time" ;
+		time:long_name = "Data time" ;
+		time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		time:axis = "T" ;
+		time:bounds = "time_bounds" ;
+		time:comment = "2010-01-01T17:09:06Z" ;
+	double start_time(time) ;
+		start_time:long_name = "start_time" ;
+		start_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		start_time:comment = "2010-01-01T17:06:19Z" ;
+	double stop_time(time) ;
+		stop_time:long_name = "stop_time" ;
+		stop_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		stop_time:comment = "2010-01-01T17:09:06Z" ;
+	double time_bounds(time, bounds) ;
+		time_bounds:comment = "time_bounds also stored the start and stop times, provided the time variable value lies within the start_time to stop_time interval" ;
+		time_bounds:units = "seconds since 1970-01-01T00:00:00Z" ;
+	float x0(x0) ;
+		x0:standard_name = "projection_x_coordinate" ;
+		x0:units = "km" ;
+		x0:axis = "X" ;
+	float y0(y0) ;
+		y0:standard_name = "projection_y_coordinate" ;
+		y0:units = "km" ;
+		y0:axis = "Y" ;
+	float lat0(y0, x0) ;
+		lat0:standard_name = "latitude" ;
+		lat0:units = "degrees_north" ;
+	float lon0(y0, x0) ;
+		lon0:standard_name = "longitude" ;
+		lon0:units = "degrees_east" ;
+	float z0(z0) ;
+		z0:standard_name = "altitude" ;
+		z0:long_name = "constant altitude levels" ;
+		z0:units = "km" ;
+		z0:positive = "up" ;
+		z0:axis = "Z" ;
+	int grid_mapping_0 ;
+		grid_mapping_0:grid_mapping_name = "azimuthal_equidistant" ;
+		grid_mapping_0:longitude_of_projection_origin = -68.0169982910156 ;
+		grid_mapping_0:latitude_of_projection_origin = -34.6479988098145 ;
+		grid_mapping_0:false_easting = 0. ;
+		grid_mapping_0:false_northing = 0. ;
+		grid_mapping_0:earth_radius = 6378137. ;
+	byte DBZ(time, z0, y0, x0) ;
+		DBZ:scale_factor = 0.5f ;
+		DBZ:add_offset = 33.5f ;
+		DBZ:valid_min = -127b ;
+		DBZ:valid_max = 127b ;
+		DBZ:_FillValue = -128b ;
+		DBZ:min_value = -29.f ;
+		DBZ:max_value = 60.f ;
+		DBZ:standard_name = "DBZ" ;
+		DBZ:long_name = "DBZ" ;
+		DBZ:units = "dBZ" ;
+		DBZ:coordinates = "lon0 lat0" ;
+		DBZ:grid_mapping = "grid_mapping_0" ;
+
+// global attributes:
+		:Conventions = "CF-1.6" ;
+		:history = "This MDV radar volume file was created by Dsr2Vol.\n",
+			"Clutter removed using ClutterRemove.\n",
+			"clutter threshold: 0\n",
+			"dBZ threshold: 0\n",
+			"dBZ margin: 5" ;
+		:institution = "UCAR" ;
+		:source = "Gobierno de Mendoza" ;
+		:title = "SAN_RAFAEL" ;
+		:comment = "Created by Mdv2NetCDF" ;
+		:origin_latitude = -34.648f ;
+		:origin_longitude = -68.017f ;
+		:origin_altitude = 550.f ;
+}

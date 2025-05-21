@@ -1,0 +1,59 @@
+//*********************************************************************
+// TDRP params for RadxConvert
+// Test 12 - Simplificación drástica, confiando en la lectura CF
+//*********************************************************************
+
+// ----- Modos Generales -----
+debug = DEBUG_VERBOSE;
+mode = FILELIST;
+// Para evitar el error de enumeración, volvemos a MDV_RADIAL temporalmente.
+// Investigaremos luego si esto produce una grilla MDV o cómo forzarlo.
+output_format = OUTPUT_FORMAT_MDV_RADIAL;
+
+// ----- Opciones de Lectura y Campos -----
+// NO definimos explícitamente los campos de salida.
+// Dejamos que RadxConvert intente leer todos los campos del NetCDF
+// y los convierta tal cual.
+set_output_fields = FALSE;
+
+// El siguiente bloque 'output_fields' DEBE ESTAR COMPLETAMENTE COMENTADO O ELIMINADO:
+// output_fields = {
+//   {
+//     input_field_name = "DBZ";
+//     output_field_name = "DBZ";
+//     long_name = "DBZ";
+//     standard_name = "DBZ"; // o "equivalent_reflectivity_factor"
+//     output_units = "dBZ";
+//     encoding = OUTPUT_ENCODING_INT08;
+//     output_scaling = SCALING_SPECIFIED;
+//     output_scale = 0.5;
+//     output_offset = 33.5;
+//   }
+// };
+
+// Según el TDRP genérico: "Si set_output_fields es FALSE, y esto es TRUE,
+// todos los otros campos (no listados en output_fields) se escribirán sin cambios."
+// Dado que no listamos ninguno, probemos TRUE para ver si procesa todos los campos que encuentre.
+write_other_fields_unchanged = TRUE;
+
+// ----- Override de Parámetros -----
+// Comentamos o eliminamos los parámetros que generaron advertencias de "no relevante",
+// ya que el lector CF probablemente los infiere automáticamente.
+// read_fixed_grid_from_netcdf = TRUE; // Ejemplo de parámetro a comentar
+// x_coord_name = "x0";
+// y_coord_name = "y0";
+// z_coord_name = "z0";
+// time_coord_name = "time";
+// lat_coord_name = "lat0";
+// lon_coord_name = "lon0";
+// use_grid_mapping_from_input_field = TRUE;
+// grid_mapping_source_is_field_attribute = TRUE;
+
+// Queremos que use la información del NetCDF tanto como sea posible.
+override_radar_params = FALSE;
+override_grid_params = FALSE;
+override_projection_params = FALSE; // Crucial para usar el grid_mapping del NetCDF
+
+// ----- Atributos Globales para el MDV de Salida -----
+// add_user_specified_global_attributes = FALSE;
+// user_defined_global_attributes = { /* ... */ };

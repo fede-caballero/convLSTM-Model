@@ -1,0 +1,26 @@
+
+=== METADATOS NetCDF (ncdump -h): /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/prediction_output_20250509_151237.nc ===
+netcdf prediction_output_20250509_151237 {
+dimensions:
+	time = 1 ;
+	level = 18 ;
+	y = 500 ;
+	x = 500 ;
+variables:
+	double time(time) ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "gregorian" ;
+	float level(level) ;
+		level:units = "km" ;
+	float DBZ_forecast(time, level, y, x) ;
+		DBZ_forecast:_FillValue = -9999.f ;
+		DBZ_forecast:units = "dBZ" ;
+		DBZ_forecast:long_name = "Predicted Radar Reflectivity" ;
+
+// global attributes:
+		:Conventions = "CF-1.7" ;
+		:title = "Radar Reflectivity Forecast (DBZ_forecast) from ConvLSTM Model (Local Inference)" ;
+		:institution = "Tu Nombre/Institucion Local" ;
+		:history = "Created 2025-05-09 18:12:37 UTC by local inference script." ;
+}
+=== FIN METADATOS NetCDF ===

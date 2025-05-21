@@ -1,0 +1,22 @@
+# radxconvert_params.tdrp
+debug = DEBUG_VERBOSE;
+mode = ARCHIVE;
+read_mode = NETCDF;
+write_mode = MDV;
+input_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/Predictions";
+output_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/predictions_final_v_ckpt/mdv_output";
+sensor_lat = -34.64799880981445;
+sensor_lon = -68.01699829101562;
+sensor_alt = 0.550000011920929;
+grid_minz = 1.0;
+grid_dz = 0.5;
+grid_minx = -249.75;
+grid_dx = 0.5;
+grid_miny = -249.75;
+grid_dy = 0.5;
+radar_name = "La_Llave";
+file_format = NETCDF4_CLASSIC;
+output_latlon_arrays = TRUE;
+output_start_end_times = TRUE;
+output_mdv_attributes = TRUE;
+output_mdv_chunks = FALSE;

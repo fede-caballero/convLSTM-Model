@@ -234,7 +234,7 @@ if __name__ == "__main__":
     # model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/jupyter_notebooks/GeminiModels/Salidas modelo andando/best_convlstm_model.pth" # O el checkpoint que quieras
     
     # Modelo con 5 épocas y 80 batches 
-    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Model_5_Epochs_80_Batches/checkpoint_epoch_5.pth"
+    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Model_5_Epochs_80_sequences/checkpoint_epoch_5.pth"
     if not os.path.exists(model_path):
         print(f"Error: Archivo de modelo no encontrado en {model_path}")
         exit()
