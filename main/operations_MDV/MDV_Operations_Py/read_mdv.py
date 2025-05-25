@@ -2,8 +2,7 @@ import pyart
 import os
 
 # Ruta a uno de los archivos .mdv
-file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/MDV_samples/big_sample/201001011/170906.mdv"  # Reemplaza con la ruta a uno de tus archivos
-
+file_path = "/home/f-caballero/UM/TIF3/convLSTM-project/pruebas_conversiones/prueba_netcdf2mdv/NcGeneric2Mdv/output_mdv_roundtrip_float/20100101/20100101_170906.mdv"
 # Leer el archivo con Py-ART
 try:
     mdv_file = pyart.io.mdv_common.MdvFile(pyart.io.prepare_for_read(file_path))
