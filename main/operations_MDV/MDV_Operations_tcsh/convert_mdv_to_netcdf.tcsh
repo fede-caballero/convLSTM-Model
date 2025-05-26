@@ -1,6 +1,7 @@
 #!/bin/tcsh
-set input_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operationsMDV/MDV_to_analyze"
-set output_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operationsMDV/MDV_to_analyze/Output_conversion"
+set input_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_MDV/MDV_Operations_tcsh"
+set output_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_MDV/MDV_Operations_tcsh/output_netCDF"
+set mdv2netcdf_params_file = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_MDV/MDV_Operations_tcsh/Mdv2NetCDF.params"
 
 # Iterar sobre carpetas (e.g., 201001011)
 foreach folder ($input_base_dir/*)
