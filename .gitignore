@@ -182,6 +182,8 @@ radar/
 
 # Archivos de datos intermedios que no querés versionar
 nc_files/
+netCDF_samples/
+*.nc
 
 # Archivos personales o temporales
 *.tmp
@@ -199,5 +201,5 @@ main/for_jupypter.py
 # Archivos de modelos pytorch
 *.pth
 # Archivos netCDF
-*.nc
+*.
 

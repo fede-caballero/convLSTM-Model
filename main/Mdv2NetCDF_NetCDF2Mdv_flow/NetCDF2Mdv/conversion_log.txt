@@ -1,0 +1,89 @@
+(pop-os) NetCDF2Mdv 6 % NetCDF2Mdv -params NetCDF2Mdv.params -f /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/Mdv2NetCDF_NetCDF2Mdv_flow/NetCDF2Mdv/ncfdata20100101_204855.nc 
+======================================================================
+Program 'NetCDF2Mdv'
+Run-time 2025/05/27 22:04:24.
+
+Copyright (c) 1992 - 2025
+University Corporation for Atmospheric Research (UCAR)
+National Center for Atmospheric Research (NCAR)
+Boulder, Colorado, USA.
+
+Redistribution and use in source and binary forms, with
+or without modification, are permitted provided that the following
+conditions are met:
+
+1) Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2) Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3) Neither the name of UCAR, NCAR nor the names of its contributors, if
+any, may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+4) If the software is modified to produce derivative works, such modified
+software should be clearly marked, so as not to confuse it with the
+version available from UCAR.
+
+======================================================================
+FileInput::init: Initializing archive FILELIST mode.
+NetCDF2Mdv::_processData: Processing file : /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/Mdv2NetCDF_NetCDF2Mdv_flow/NetCDF2Mdv/ncfdata20100101_204855.nc
+SUCCESS - opened file: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/Mdv2NetCDF_NetCDF2Mdv_flow/NetCDF2Mdv/ncfdata20100101_204855.nc
+Default time dimension: time
+  time: 2010/01/01 20:48:55
+SUCCESS - setting time coord variable
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: time_bounds
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: time_bounds
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lat0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lat0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lon0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lon0
+Ncf2MdvTrans::_shouldAddField
+  -->> adding field: DBZ
+Ncf2MdvTrans::_shouldAddField
+  Checking variable for field data: DBZ
+SUCCESS - var has X coordinate, dim: x0
+SUCCESS - var has Y coordinate, dim: y0
+NOTE - var has Z coordinate, dim: z0
+Ncf2MdvTrans::_adjustTimeInfo
+  -->> adding field: DBZ
+SUCCESS - opened file: /home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/Mdv2NetCDF_NetCDF2Mdv_flow/NetCDF2Mdv/ncfdata20100101_204855.nc
+SUCCESS - setting master header
+Default time dimension: time
+  time: 2010/01/01 20:48:55
+SUCCESS - setting time coord variable
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: time_bounds
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: time_bounds
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lat0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lat0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lon0
+Ncf2MdvTrans::_shouldAddField
+  -->> rejecting field: lon0
+Ncf2MdvTrans::_shouldAddField
+  -->> adding field: DBZ
+Ncf2MdvTrans::_shouldAddField
+  Checking variable for field data: DBZ
+SUCCESS - var has X coordinate, dim: x0
+SUCCESS - var has Y coordinate, dim: y0
+NOTE - var has Z coordinate, dim: z0
+Ncf2MdvTrans::_addOneField
+  -->> adding field: DBZ
+Adding data field: DBZ
+             time: 2010/01/01 20:48:55
+Ncf2MdvTrans::addDataFieldsTime elapsed = 0
+Ncf2MdvTrans::addGlobalAttrXmlChunk()
+Wrote file: /tmp/mdv/20100101/20100101_204855.mdv
+

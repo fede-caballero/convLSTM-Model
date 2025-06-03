@@ -70,5 +70,5 @@ def process_folder(folder_path):
             plot_composite(composite, file)
 
 # Uso del script
-folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Test-Sequence/201511164' 
+folder_path = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/' 
 process_folder(folder_path)

@@ -1,0 +1,249 @@
+
+File path: ./204855.mdv
+
+-------------------------------
+MDV format states
+  Internal format: FORMAT_MDV
+  Read     format: FORMAT_MDV
+  Write    format: FORMAT_NCF
+-------------------------------
+
+
+Master header
+-------------
+
+record_len1:          3408
+struct_id:            14152
+revision_number:      2
+
+time_gen:             2010/01/01 20:47:40
+user_time:            not set
+time_begin:           2010/01/01 20:46:07
+time_end:             2010/01/01 20:48:55
+time_centroid:        2010/01/01 20:48:55
+time_expire:          2010/01/01 20:54:31
+time_written:         2010/01/01 20:47:43
+epoch:                0
+forecast_time:        not set
+forecast_delta:       0
+num_data_times:       1
+index_number:         0
+data_dimension:       3
+data_collection_type: Measured
+user_data:            0
+native_vlevel_type:   Elevation angles - radar
+vlevel_type:          Constant Altitude (units KM MSL)
+vlevel_included:      true
+grid_orientation:     ORIENT_SN_WE
+data_ordering:        ORDER_XYZ
+n_fields:             1
+max_nx:               500
+max_ny:               500
+max_nz:               18
+n_chunks:             2
+field_hdr_offset:     1024
+vlevel_hdr_offset:    1440
+chunk_hdr_offset:     2464
+field_grids_differ:   false
+user_data_si32[0]:    0
+user_data_si32[1]:    0
+user_data_si32[2]:    0
+user_data_si32[3]:    0
+user_data_si32[4]:    0
+user_data_si32[5]:    0
+user_data_si32[6]:    0
+user_data_si32[7]:    0
+
+user_data_fl32[0]:    0
+user_data_fl32[1]:    0
+user_data_fl32[2]:    0
+user_data_fl32[3]:    0
+user_data_fl32[4]:    0
+user_data_fl32[5]:    0
+sensor_lon:           -68.017
+sensor_lat:           -34.648
+sensor_alt:           0.55
+
+data_set_info:
+This MDV radar volume file was created by Dsr2Vol.
+Clutter removed using ClutterRemove.
+clutter threshold: 0
+dBZ threshold: 0
+dBZ margin: 5
+
+data_set_name:        SAN_RAFAEL
+data_set_source:      Gobierno de Mendoza
+
+record_len2:          3408
+
+
+
+Field header
+------------
+
+field_name_long:        DBZ
+field_name:             DBZ
+units:                  dBZ
+transform:              dBZ
+
+record_len1:            1352
+struct_id:              14153
+
+field_code:             0
+user_time1:             not set
+forecast_delta:         0
+user_time2:             not set
+user_time3:             not set
+forecast_time:          not set
+user_time4:             not set
+nx:                     500
+ny:                     500
+nz:                     18
+proj_type:              Flat (Cartesian) (units in KM)
+encoding_type:          ENCODING_INT8 (CHAR/BYTE)
+data_element_nbytes:    1
+field_data_offset:      3492
+volume_size:            20225
+user_data_si32[0]:      0
+user_data_si32[1]:      0
+user_data_si32[2]:      0
+user_data_si32[3]:      0
+user_data_si32[4]:      0
+user_data_si32[5]:      0
+user_data_si32[6]:      0
+user_data_si32[7]:      0
+user_data_si32[8]:      0
+user_data_si32[9]:      0
+compression_type:       COMPRESSION_ZLIB
+requested_compression:  COMPRESSION_NONE
+transform_type:         DATA_TRANSFORM_NONE - Depicts an area or volume in space
+scaling_type:           SCALING_NONE
+
+native_vlevel_type:     Elevation angles - radar
+vlevel_type:            Constant Altitude (units KM MSL)
+dz_constant:            1
+data_dimension:         3
+
+zoom_clipped:           0
+zoom_no_overlap:        0
+
+proj_origin_lon:        -68.017
+proj_origin_lat:        -34.648
+proj_rotation:          0
+proj_param[0]:          0
+proj_param[1]:          0
+proj_param[2]:          0
+proj_param[3]:          0
+proj_param[4]:          0
+proj_param[5]:          0
+proj_param[6]:          0
+proj_param[7]:          0
+proj_param[8]:          0
+proj_param[9]:          0
+proj_param[10]:         0
+proj_param[11]:         0
+proj_param[12]:         0
+proj_param[13]:         0
+proj_param[14]:         0
+proj_param[15]:         0
+proj4_str:              
+vert_reference:         0
+
+grid_dx:                1
+grid_dy:                1
+grid_dz:                1
+grid_minx:              -249.5
+grid_miny:              -249.5
+grid_minz:              1
+scale:                  0.5
+bias:                   -30
+bad_data_value:         0
+missing_data_value:     0
+proj_rotation:          0
+user_data_fl32[0]:      0.55
+user_data_fl32[1]:      0
+user_data_fl32[2]:      0
+user_data_fl32[3]:      0
+min_value:              -29
+max_value:              60.5
+min_value_orig_vol:     -29
+max_value_orig_vol:     60.5
+record_len2:            1352
+
+
+Vlevel_header for field: DBZ
+------------------------
+64-bit version
+record_len1:             17416
+struct_id:               14154
+vlevel type              Constant Altitude (units KM MSL)
+vlevel[  0]:             1
+vlevel[  1]:             2
+vlevel[  2]:             3
+vlevel[  3]:             4
+vlevel[  4]:             5
+vlevel[  5]:             6
+vlevel[  6]:             7
+vlevel[  7]:             8
+vlevel[  8]:             9
+vlevel[  9]:             10
+vlevel[ 10]:             11
+vlevel[ 11]:             12
+vlevel[ 12]:             13
+vlevel[ 13]:             14
+vlevel[ 14]:             15
+vlevel[ 15]:             16
+vlevel[ 16]:             17
+vlevel[ 17]:             18
+record_len2:             17416
+
+Projection: Flat (Cartesian) (units in KM)
+-----------
+  Projection: PROJ_AZIM_EQUIDIST (Flat)
+  origin_lon (deg): -68.017
+  origin_lat (deg): -34.648
+  rotation (deg)  : 0
+
+Grid:
+----
+  nx, ny, nz: 500, 500, 18
+  minx, miny, minz: -249.5, -249.5, 1
+  maxx, maxy: 249.5, 249.5
+  dx, dy, dz: 1, 1, 1
+  sensor_x, sensor_y, sensor_z: 0, 0, 0.55
+  sensor_lat, sensor_lon: -34.648, -68.017
+  proj origin latitude: -34.648
+  proj origin longitude: -68.017
+  grid origin latitude: -34.648
+  grid origin longitude: -68.017
+  minLat, minLon: -36.8893, -70.8179
+  maxLat, maxLon: -32.3778, -65.2161
+  dz_constant: true
+  x units: km
+  y units: km
+  z units: km
+
+
+Chunk header
+------------
+record_len1:           1080
+struct_id:             14155
+chunk_id:              3
+                       CHUNK_DSRADAR_PARAMS
+chunk_data_offset:     23725
+size:                  240
+info:                  DsRadar params
+record_len2:           1080
+
+
+Chunk header
+------------
+record_len1:           1080
+struct_id:             14155
+chunk_id:              4
+                       CHUNK_DSRADAR_ELEVATIONS
+chunk_data_offset:     23973
+size:                  56
+info:                  Radar Elevation angles
+record_len2:           1080
+

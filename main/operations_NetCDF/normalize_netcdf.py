@@ -5,8 +5,8 @@ import numpy as np
 from scipy.ndimage import zoom
 
 # Directorios
-input_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample"
-output_base_dir = "/home/f-caballero/UM/netCDF_Big_sample"
+input_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_MDV/MDV_Operations_tcsh/netCDF"
+output_base_dir = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/operations_MDV/MDV_Operations_tcsh/netCDF/normalized_output"
 log_file = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/logs/normalize_log.txt"
 
 # Crear archivo de log

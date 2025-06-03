@@ -1,0 +1,71 @@
+netcdf pred_DBZ_lead05_20250530_134532_sample0 {
+dimensions:
+	time = UNLIMITED ; // (1 currently)
+	bounds = 2 ;
+	x0 = 500 ;
+	y0 = 500 ;
+	z0 = 18 ;
+variables:
+	double time(time) ;
+		time:standard_name = "time" ;
+		time:long_name = "Data time" ;
+		time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		time:axis = "T" ;
+		time:bounds = "time_bounds" ;
+		time:comment = "2025-05-30T13:45:32Z" ;
+	double time_bounds(time, bounds) ;
+		time_bounds:comment = "time_bounds also stored the start and stop times, provided the time variable value lies within the start_time to stop_time interval" ;
+		time_bounds:units = "seconds since 1970-01-01T00:00:00Z" ;
+	double start_time(time) ;
+		start_time:long_name = "start_time" ;
+		start_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		start_time:comment = "2025-05-30T13:44:02Z" ;
+	double stop_time(time) ;
+		stop_time:long_name = "stop_time" ;
+		stop_time:units = "seconds since 1970-01-01T00:00:00Z" ;
+		stop_time:comment = "2025-05-30T13:47:02Z" ;
+	float x0(x0) ;
+		x0:standard_name = "projection_x_coordinate" ;
+		x0:units = "km" ;
+		x0:axis = "X" ;
+	float y0(y0) ;
+		y0:standard_name = "projection_y_coordinate" ;
+		y0:units = "km" ;
+		y0:axis = "Y" ;
+	float z0(z0) ;
+		z0:standard_name = "altitude" ;
+		z0:long_name = "constant altitude levels" ;
+		z0:units = "km" ;
+		z0:positive = "up" ;
+		z0:axis = "Z" ;
+	int grid_mapping_0 ;
+		grid_mapping_0:grid_mapping_name = "azimuthal_equidistant" ;
+		grid_mapping_0:longitude_of_projection_origin = -68.0169982910156 ;
+		grid_mapping_0:latitude_of_projection_origin = -34.6479988098145 ;
+		grid_mapping_0:false_easting = 0. ;
+		grid_mapping_0:false_northing = 0. ;
+		grid_mapping_0:earth_radius = 6378137. ;
+	byte DBZ(time, z0, y0, x0) ;
+		DBZ:_FillValue = -128b ;
+		DBZ:units = "dBZ" ;
+		DBZ:long_name = "DBZ" ;
+		DBZ:standard_name = "DBZ" ;
+		DBZ:coordinates = "lon0 lat0" ;
+		DBZ:grid_mapping = "grid_mapping_0" ;
+		DBZ:scale_factor = 0.5f ;
+		DBZ:add_offset = 33.5f ;
+		DBZ:valid_min = -127b ;
+		DBZ:valid_max = 127b ;
+		DBZ:min_value = -29.f ;
+		DBZ:max_value = 60.5f ;
+
+// global attributes:
+		:Conventions = "CF-1.6" ;
+		:title = "SAN_RAFAEL - Forecast lead t+15min" ;
+		:institution = "UCAR" ;
+		:source = "Gobierno de Mendoza" ;
+		:history = "Created 2025-05-30 13:45:32 UTC by ConvLSTM prediction script." ;
+		:comment = "Forecast data from ConvLSTM model for lead time +15 min. Based on input data up to 2025-05-30T13:30:32Z." ;
+		:references = "Tesis de Federico Caballero, Universidad de Mendoza" ;
+		:_Format = "classic" ;
+}

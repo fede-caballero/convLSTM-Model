@@ -1,21 +1,16 @@
 import os
-import glob
+import re
 import time
 from datetime import datetime, timedelta
 import logging
-
+import pyproj
 import numpy as np
 import torch
 import torch.nn as nn
 from netCDF4 import Dataset as NCDataset
 import matplotlib.pyplot as plt
-# No necesitas torch.amp para inferencia en CPU generalmente, ni checkpoint
-# from torch.utils.checkpoint import checkpoint
 
 # --- Definición de las Clases del Modelo ---
-# (Copia aquí las clases: ConvLSTMCell, ConvLSTM2DLayer, ConvLSTM3D_Enhanced
-#  tal como están en tu script de entrenamiento final que funcionó)
-
 class ConvLSTMCell(nn.Module):
     def __init__(self, input_dim, hidden_dim, kernel_size, bias=True):
         super(ConvLSTMCell, self).__init__()
@@ -70,7 +65,6 @@ class ConvLSTM3D_Enhanced(nn.Module):
         if isinstance(hidden_dims, int): hidden_dims = [hidden_dims] * num_layers
         if isinstance(kernel_sizes, tuple): kernel_sizes = [kernel_sizes] * num_layers
         assert len(hidden_dims) == num_layers and len(kernel_sizes) == num_layers
-
         self.input_dim = input_dim; self.hidden_dims = hidden_dims; self.num_layers = num_layers
         self.pred_steps = pred_steps; self.use_layer_norm = use_layer_norm; self.use_residual = use_residual
         self.layers = nn.ModuleList(); self.layer_norms = nn.ModuleList() if use_layer_norm else None
@@ -84,16 +78,13 @@ class ConvLSTM3D_Enhanced(nn.Module):
             current_dim = hidden_dims[i]
         self.output_conv = nn.Conv3d(in_channels=hidden_dims[-1], out_channels=input_dim * pred_steps,
                                      kernel_size=(1, 3, 3), padding=(0, 1, 1))
-        # No necesitas logging.info aquí para un script de inferencia simple
-
-    def forward(self, x_volumetric): # Espera (Z, B, T_in, H, W, C_in)
+    def forward(self, x_volumetric):
         num_z_levels, b, seq_len, h, w, c_in = x_volumetric.shape
         all_level_predictions = []
         for z_idx in range(num_z_levels):
             x_level = x_volumetric[z_idx, ...]; x_level_permuted = x_level.permute(0, 1, 4, 2, 3)
             current_input = x_level_permuted
             for i in range(self.num_layers):
-                # No se usa checkpointing durante model.eval()
                 layer_output, _ = self.layers[i](current_input)
                 if self.use_layer_norm and self.layer_norms:
                     B_ln, T_ln, C_ln, H_ln, W_ln = layer_output.shape
@@ -114,110 +105,178 @@ class ConvLSTM3D_Enhanced(nn.Module):
         return predictions_volumetric
 
 # --- Funciones de Ayuda ---
-def load_and_preprocess_input_sequence(input_file_paths, min_dbz, max_dbz, expected_shape, variable_name):
-    """Carga 6 archivos NetCDF, los preprocesa y los apila."""
+def load_and_preprocess_input_sequence(input_file_paths, min_dbz, max_dbz, expected_shape, variable_name, seq_len):
     input_data_list = []
     expected_z, expected_h, expected_w = expected_shape
-
-    if len(input_file_paths) != 6: # O la seq_len que usaste para entrenar
-        raise ValueError(f"Se esperan 6 archivos de entrada, se recibieron {len(input_file_paths)}")
-
+    if len(input_file_paths) != seq_len:
+        raise ValueError(f"Se esperan {seq_len} archivos, se recibieron {len(input_file_paths)}")
     for file_path in input_file_paths:
         if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Archivo de entrada no encontrado: {file_path}")
+            raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
         with NCDataset(file_path, 'r') as nc_file:
-            dbz = nc_file.variables[variable_name][0, ...].astype(np.float32)
+            dbz_var = nc_file.variables[variable_name]
+            scale = getattr(dbz_var, 'scale_factor', 1.0)
+            offset = getattr(dbz_var, 'add_offset', 0.0)
+            fill_value = getattr(dbz_var, '_FillValue', None)
+            dbz = dbz_var[0, ...].astype(np.float32)
             if dbz.shape != (expected_z, expected_h, expected_w):
-                raise ValueError(f"Forma inesperada {dbz.shape} en {file_path}. Se esperaba {(expected_z, expected_h, expected_w)}")
-            dbz = np.clip(dbz, min_dbz, max_dbz)
-            dbz_normalized = (dbz - min_dbz) / (max_dbz - min_dbz)
-            dbz_normalized = dbz_normalized[..., np.newaxis] # (Z, H, W, C)
+                raise ValueError(f"Forma inesperada {dbz.shape} en {file_path}")
+            dbz_physical = dbz * scale + offset
+            if fill_value is not None:
+                dbz_physical[dbz == fill_value] = np.nan
+            dbz_clipped = np.clip(dbz_physical, min_dbz, max_dbz, out=np.full_like(dbz_physical, np.nan))
+            dbz_normalized = np.where(np.isnan(dbz_clipped), np.nan,
+                                     (dbz_clipped - min_dbz) / (max_dbz - min_dbz))
+            dbz_normalized = dbz_normalized[..., np.newaxis]
             input_data_list.append(dbz_normalized)
-    
-    input_sequence_np = np.stack(input_data_list, axis=1) # (Z, T_in, H, W, C)
-    x_input_tensor = torch.from_numpy(input_sequence_np).float()
-    x_input_tensor = x_input_tensor.unsqueeze(0) # Añadir dim de batch -> (B, Z, T_in, H, W, C)
-    x_input_tensor = x_input_tensor.permute(1, 0, 2, 3, 4, 5) # (Z, B, T_in, H, W, C)
+    input_sequence_np = np.stack(input_data_list, axis=1)
+    x_input_tensor = torch.from_numpy(np.nan_to_num(input_sequence_np, nan=0.0)).float()
+    x_input_tensor = x_input_tensor.unsqueeze(0).permute(1, 0, 2, 3, 4, 5)
     return x_input_tensor
 
 def save_prediction_as_netcdf(output_path, pred_data_desnorm, config_params, prediction_datetime):
-    """Guarda la predicción desnormalizada como un archivo NetCDF con metadatos."""
-    # pred_data_desnorm debe ser (Z, H, W)
-    # Lo expandimos a (1, Z, H, W) para el formato de tiempo
-    pred_data_final_for_nc = np.expand_dims(pred_data_desnorm, axis=0)
-
+    pred_data_byte = np.where(pred_data_desnorm < 0, -128,
+                             np.clip(((pred_data_desnorm - 33.5) / 0.5), -127, 127).round().astype(np.int8))
+    pred_data_final_for_nc = np.expand_dims(pred_data_byte, axis=0)
     num_z, height, width = pred_data_desnorm.shape
-    
-    with NCDataset(output_path, 'w', format='NETCDF4') as ncfile:
-        # Atributos Globales
-        ncfile.Conventions = "CF-1.7"
-        ncfile.title = f"Radar Reflectivity Forecast ({config_params['dbz_variable_name_pred']}) from ConvLSTM Model (Local Inference)"
-        ncfile.institution = config_params.get('institution_name', "Desconocida")
-        ncfile.history = f"Created {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')} by local inference script."
-        # ... (puedes añadir más atributos globales de tu config si quieres) ...
-
-        # Dimensiones
-        ncfile.createDimension('time', 1)
-        ncfile.createDimension('level', num_z)
-        ncfile.createDimension('y', height)
-        ncfile.createDimension('x', width)
-
-        # Variables de Coordenadas (simplificado, puedes añadir más detalle como en el script de entrenamiento)
-        time_var = ncfile.createVariable('time', 'f8', ('time',))
-        epoch_time = datetime(1970, 1, 1, 0, 0, 0)
+    grid_minx_km = config_params.get('grid_minx_km', -249.5)
+    grid_miny_km = config_params.get('grid_miny_km', -249.5)
+    grid_dx_km = config_params.get('grid_dx_km', 1.0)
+    grid_dy_km = config_params.get('grid_dy_km', 1.0)
+    grid_minz_km = config_params.get('grid_minz_km', 1.0)
+    grid_dz_km = config_params.get('grid_dz_km', 0.5)
+    x_coord_values = np.arange(grid_minx_km, grid_minx_km + width * grid_dx_km, grid_dx_km, dtype=np.float32)
+    y_coord_values = np.arange(grid_miny_km, grid_miny_km + height * grid_dy_km, grid_dy_km, dtype=np.float32)
+    z_coord_values = np.arange(grid_minz_km, grid_minz_km + num_z * grid_dz_km, grid_dz_km, dtype=np.float32)
+    proj_origin_lon = config_params.get('sensor_longitude', -68.0169982910156)
+    proj_origin_lat = config_params.get('sensor_latitude', -34.6479988098145)
+    earth_radius_m = config_params.get('earth_radius_m', 6378137)
+    proj = pyproj.Proj(proj="aeqd", lon_0=proj_origin_lon, lat_0=proj_origin_lat, R=earth_radius_m)
+    x_grid, y_grid = np.meshgrid(x_coord_values, y_coord_values)
+    lon0, lat0 = proj(x_grid, y_grid, inverse=True)
+    with NCDataset(output_path, 'w', format='NETCDF3_CLASSIC') as ncfile:
+        ncfile.Conventions = "CF-1.6"
+        ncfile.title = f"SAN_RAFAEL - Forecast t+{config_params.get('prediction_interval_minutes', 3)}min"
+        ncfile.institution = config_params.get('institution_name', "UCAR")
+        ncfile.source = config_params.get('data_source_name', "Gobierno de Mendoza")
+        ncfile.history = f"Created {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')} by ConvLSTM prediction script."
+        ncfile.comment = f"Forecast data from ConvLSTM model for lead time +{config_params.get('prediction_interval_minutes', 3)} min."
+        ncfile.references = "Tesis de Federico Caballero, Universidad de Mendoza"
+        ncfile.createDimension('time', None)
+        ncfile.createDimension('bounds', 2)
+        ncfile.createDimension('x0', width)
+        ncfile.createDimension('y0', height)
+        ncfile.createDimension('z0', num_z)
+        time_v = ncfile.createVariable('time', 'f8', ('time',))
+        time_v.standard_name = "time"
+        time_v.long_name = "Data time"
+        time_v.units = "seconds since 1970-01-01T00:00:00Z"
+        time_v.axis = "T"
+        time_v.bounds = "time_bounds"
+        epoch_time = datetime(1970, 1, 1)
         time_value_seconds = (prediction_datetime.replace(tzinfo=None) - epoch_time).total_seconds()
-        time_var[:] = [time_value_seconds]
-        time_var.units = "seconds since 1970-01-01 00:00:00 UTC"; time_var.calendar = "gregorian"
-
-        level_var = ncfile.createVariable('level', 'f4', ('level',))
-        level_var[:] = np.arange(config_params.get('grid_minz_km',1.0), config_params.get('grid_minz_km',1.0) + num_z * config_params.get('grid_dz_km',0.5), config_params.get('grid_dz_km',0.5))[:num_z]
-        level_var.units = "km"
-
-        # Variable de Datos
-        pred_var = ncfile.createVariable(config_params['dbz_variable_name_pred'], 'f4', ('time', 'level', 'y', 'x'),
-                                         fill_value=np.float32(config_params.get('fill_value', -9999.0)))
-        pred_var.units = 'dBZ'
-        pred_var.long_name = 'Predicted Radar Reflectivity'
-        pred_var[:] = pred_data_final_for_nc
-        print(f"Predicción guardada en: {output_path}")
-
+        time_v.comment = prediction_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        time_v[:] = [time_value_seconds]
+        time_bnds_v = ncfile.createVariable('time_bounds', 'f8', ('time', 'bounds'))
+        time_bnds_v.comment = "Time bounds for data interval"
+        time_bnds_v.units = "seconds since 1970-01-01T00:00:00Z"
+        time_begin_calc_seconds = time_value_seconds - (2 * 60 + 48)
+        time_end_calc_seconds = time_value_seconds
+        time_bnds_v[:] = [[time_begin_calc_seconds, time_end_calc_seconds]]
+        start_time_v = ncfile.createVariable('start_time', 'f8', ('time',))
+        start_time_v.long_name = "start_time"
+        start_time_v.units = "seconds since 1970-01-01T00:00:00Z"
+        start_time_v.comment = datetime.fromtimestamp(time_begin_calc_seconds).strftime("%Y-%m-%dT%H:%M:%SZ")
+        start_time_v[:] = [time_begin_calc_seconds]
+        stop_time_v = ncfile.createVariable('stop_time', 'f8', ('time',))
+        stop_time_v.long_name = "stop_time"
+        stop_time_v.units = "seconds since 1970-01-01T00:00:00Z"
+        stop_time_v.comment = datetime.fromtimestamp(time_end_calc_seconds).strftime("%Y-%m-%dT%H:%M:%SZ")
+        stop_time_v[:] = [time_end_calc_seconds]
+        x_v = ncfile.createVariable('x0', 'f4', ('x0',))
+        x_v.standard_name = "projection_x_coordinate"
+        x_v.units = "km"
+        x_v.axis = "X"
+        x_v[:] = x_coord_values
+        y_v = ncfile.createVariable('y0', 'f4', ('y0',))
+        y_v.standard_name = "projection_y_coordinate"
+        y_v.units = "km"
+        y_v.axis = "Y"
+        y_v[:] = y_coord_values
+        z_v = ncfile.createVariable('z0', 'f4', ('z0',))
+        z_v.standard_name = "altitude"
+        z_v.long_name = "constant altitude levels"
+        z_v.units = "km"
+        z_v.positive = "up"
+        z_v.axis = "Z"
+        z_v[:] = z_coord_values
+        lat0_v = ncfile.createVariable('lat0', 'f4', ('y0', 'x0'))
+        lat0_v.standard_name = "latitude"
+        lat0_v.units = "degrees_north"
+        lat0_v[:] = lat0
+        lon0_v = ncfile.createVariable('lon0', 'f4', ('y0', 'x0'))
+        lon0_v.standard_name = "longitude"
+        lon0_v.units = "degrees_east"
+        lon0_v[:] = lon0
+        gm_v = ncfile.createVariable('grid_mapping_0', 'i4')
+        gm_v.grid_mapping_name = "azimuthal_equidistant"
+        gm_v.longitude_of_projection_origin = proj_origin_lon
+        gm_v.latitude_of_projection_origin = proj_origin_lat
+        gm_v.false_easting = 0.0
+        gm_v.false_northing = 0.0
+        gm_v.earth_radius = earth_radius_m
+        dbz_v = ncfile.createVariable('DBZ', 'i1', ('time', 'z0', 'y0', 'x0'),
+                                      fill_value=np.int8(-128))
+        dbz_v.units = 'dBZ'
+        dbz_v.long_name = 'DBZ'
+        dbz_v.standard_name = 'DBZ'
+        dbz_v.coordinates = "lon0 lat0"
+        dbz_v.grid_mapping = "grid_mapping_0"
+        dbz_v.scale_factor = np.float32(0.5)
+        dbz_v.add_offset = np.float32(33.5)
+        dbz_v.valid_min = np.int8(-127)
+        dbz_v.valid_max = np.int8(127)
+        dbz_v.min_value = np.float32(config_params.get('min_dbz', -29.0))
+        dbz_v.max_value = np.float32(config_params.get('max_dbz', 60.5))
+        dbz_v[:] = pred_data_final_for_nc
+    print(f"Predicción guardada en: {output_path}")
 
 # --- Configuración Principal para Inferencia ---
 if __name__ == "__main__":
     print("Iniciando script de inferencia local...")
-
-    # --- 1. Parámetros (DEBEN COINCIDIR CON LOS DEL ENTRENAMIENTO DEL MODELO CARGADO) ---
-    # Estos son los parámetros de la arquitectura del modelo que funcionó sin OOM y fue guardado
     model_architecture_config = {
         'input_dim': 1,
-        'hidden_dims': [32, 32],    # La última que probaste que funcionó
+        'hidden_dims': [32, 32],
         'kernel_sizes': [(3,3), (3,3)],
-        'num_layers': 2,           # La última que probaste que funcionó
+        'num_layers': 2,
         'pred_steps': 1,
         'use_layer_norm': True,
         'use_residual': False,
         'img_height': 500,
         'img_width': 500
     }
-
-    # Parámetros de datos y normalización (deben ser los mismos del entrenamiento)
     data_params = {
-        'min_dbz': -30.0,
-        'max_dbz': 70.0,
-        'expected_shape': (18, 500, 500), # (Z, H, W)
-        'variable_name': 'DBZ', # Nombre de la variable en los archivos NC de ENTRADA
-        'dbz_variable_name_pred': 'DBZ_forecast', # Nombre para la variable en el NC de SALIDA
-        'fill_value': -9999.0,
-        # Parámetros de grilla para metadatos del NC de salida (opcional, pero bueno para consistencia)
-        'grid_minz_km': 1.0, 'grid_dz_km': 0.5,
-        # ... (puedes añadir más de tu config original si los usas en save_prediction_as_netcdf) ...
-        'institution_name': "Tu Nombre/Institucion Local"
+        'min_dbz': -29.0,
+        'max_dbz': 60.5,
+        'expected_shape': (18, 500, 500),
+        'variable_name': 'DBZ',
+        'dbz_variable_name_pred': 'DBZ',
+        'fill_value': -128,
+        'grid_minz_km': 1.0,
+        'grid_dz_km': 1.0,
+        'grid_minx_km': -249.5,
+        'grid_dx_km': 1.0,
+        'grid_miny_km': -249.5,
+        'grid_dy_km': 1.0,
+        'sensor_longitude': -68.0169982910156,
+        'sensor_latitude': -34.6479988098145,
+        'earth_radius_m': 6378137,
+        'institution_name': "UCAR",
+        'data_source_name': "Gobierno de Mendoza",
+        'prediction_interval_minutes': 3
     }
-    
-    # --- 2. Definir Dispositivo y Cargar Modelo ---
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Usando dispositivo: {device}")
-
     model = ConvLSTM3D_Enhanced(
         input_dim=model_architecture_config['input_dim'],
         hidden_dims=model_architecture_config['hidden_dims'],
@@ -229,104 +288,70 @@ if __name__ == "__main__":
         img_height=model_architecture_config['img_height'],
         img_width=model_architecture_config['img_width']
     )
-
-    # --- CAMBIA ESTA RUTA a donde tengas tu archivo .pth guardado ---
-    # model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/jupyter_notebooks/GeminiModels/Salidas modelo andando/best_convlstm_model.pth" # O el checkpoint que quieras
-    
-    # Modelo con 5 épocas y 80 batches 
-    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/main/models/Model_5_Epochs_80_sequences/checkpoint_epoch_5.pth"
+    model_path = "/home/f-caballero/UM/TIF3/convLSTM-project/Modificaciones_modelo/WorkinModel_30-05-25/010625-New_try/Modelo-de-Grok-3/model_out/best_convlstm_model.pth"
     if not os.path.exists(model_path):
         print(f"Error: Archivo de modelo no encontrado en {model_path}")
         exit()
-
     try:
-        checkpoint_data = torch.load(model_path, map_location=device) # map_location es crucial para CPU
+        checkpoint_data = torch.load(model_path, map_location=device)
         model.load_state_dict(checkpoint_data['model_state_dict'])
         model.to(device)
-        model.eval() # ¡MUY IMPORTANTE para inferencia!
+        model.eval()
         print(f"Modelo cargado exitosamente desde: {model_path}")
     except Exception as e:
         print(f"Error al cargar el modelo: {e}")
         exit()
-
-    # --- 3. Preparar la Secuencia de Entrada ---
-    # --- CAMBIA ESTAS RUTAS a tus 6 archivos NetCDF de entrada para la nueva predicción ---
-    # Deben estar en orden cronológico.
     input_nc_files_for_prediction = [
-        #Modelo entrenado con 6 archivos de entrada
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121051.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121355.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/121658.nc",
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122002.nc", 
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122305.nc", 
-        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/Big-Sample-New/201511164/122609.nc", 
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/180809.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/181058.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/181421.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/181709.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/181958.nc",
+        "/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/2010010112/182245.nc",
     ]
-    # Ajusta la longitud de esta lista a la 'seq_len' con la que se entrenó el modelo cargado.
-    # Si el modelo se entrenó con seq_len=3 (como en la última config de prueba):
-    # input_nc_files_for_prediction = input_nc_files_for_prediction[:3]
-    
-    # Define la seq_len usada para entrenar el modelo que estás cargando
-    # (importante para load_and_preprocess_input_sequence)
-    seq_len_entrenamiento = 3 # O 6, o la que corresponda a tu 'model_path'
-    
-    # Asegúrate de que la lista de archivos coincida con seq_len_entrenamiento
+    seq_len_entrenamiento = 6
     if len(input_nc_files_for_prediction) != seq_len_entrenamiento:
-        print(f"Advertencia: Se esperaban {seq_len_entrenamiento} archivos de entrada, pero se proporcionaron {len(input_nc_files_for_prediction)}.")
-        print("Asegúrate de que la lista 'input_nc_files_for_prediction' y 'seq_len_entrenamiento' sean correctas.")
-        # Podrías añadir un exit() aquí o intentar continuar si estás seguro.
-    
+        print(f"Error: Se esperaban {seq_len_entrenamiento} archivos, pero se proporcionaron {len(input_nc_files_for_prediction)}.")
+        exit()
     print(f"Cargando {len(input_nc_files_for_prediction)} archivos de entrada para la predicción...")
     try:
         x_input = load_and_preprocess_input_sequence(
-            input_nc_files_for_prediction,
-            data_params['min_dbz'],
-            data_params['max_dbz'],
-            data_params['expected_shape'],
-            data_params['variable_name']
+            input_file_paths=input_nc_files_for_prediction,
+            min_dbz=data_params['min_dbz'],
+            max_dbz=data_params['max_dbz'],
+            expected_shape=data_params['expected_shape'],
+            variable_name=data_params['variable_name'],
+            seq_len=seq_len_entrenamiento
         )
         x_input = x_input.to(device)
         print(f"Tensor de entrada preparado con forma: {x_input.shape}")
     except Exception as e:
         print(f"Error al preparar los datos de entrada: {e}")
         exit()
-
-    # --- 4. Realizar la Predicción ---
     print("Realizando predicción...")
     inference_start_time = time.time()
     with torch.no_grad():
-        prediction_normalized = model(x_input) # Salida: (Z, B, T_pred, H, W, C)
+        prediction_normalized = model(x_input)
     inference_end_time = time.time()
     print(f"Predicción completada en {inference_end_time - inference_start_time:.2f} segundos.")
-
-    # --- 5. Post-Procesar y Desnormalizar ---
-    # Asumiendo B=1, T_pred=1, C=1 en la salida del modelo
-    pred_data_np = prediction_normalized.squeeze(1).squeeze(1).squeeze(-1).cpu().numpy() # (Z, H, W)
+    pred_data_np = prediction_normalized.squeeze(1).squeeze(1).squeeze(-1).cpu().numpy()
     dbz_predicted_desnormalized = pred_data_np * (data_params['max_dbz'] - data_params['min_dbz']) + data_params['min_dbz']
     print(f"Forma de la predicción desnormalizada (Z, H, W): {dbz_predicted_desnormalized.shape}")
-
-    # --- 6. Guardar la Predicción (Opcional) ---
-    # Necesitas el timestamp para el cual es esta predicción.
-    # Deberías determinarlo a partir del último archivo de entrada + el intervalo de predicción.
-    # Ejemplo MUY BÁSICO (¡DEBES ADAPTAR ESTO CON TIEMPOS REALES!):
-    # Si parseas el nombre del último archivo de entrada:
-    # last_input_datetime = parse_datetime_from_filename(input_nc_files_for_prediction[-1])
-    # prediction_interval = timedelta(minutes=5) # Asumiendo 5 min
-    # current_prediction_datetime = last_input_datetime + prediction_interval
-    current_prediction_datetime = datetime.now() # Placeholder, usa un tiempo real
-    
+    # Usar timestamp actual como placeholder
+    current_prediction_datetime = datetime.now()
     output_nc_path = f"./prediction_output_{current_prediction_datetime.strftime('%Y%m%d_%H%M%S')}.nc"
-    save_prediction_as_netcdf(output_nc_path, dbz_predicted_desnormalized, data_params, current_prediction_datetime)
-
-    # --- 7. Visualizar una Capa de la Predicción (Opcional) ---
-    layer_to_plot = 10 # Elige una capa Z (0 a 17)
+    save_prediction_as_netcdf(output_path=output_nc_path,
+                              pred_data_desnorm=dbz_predicted_desnormalized,
+                              config_params=data_params,
+                              prediction_datetime=current_prediction_datetime)
+    layer_to_plot = 10
     if dbz_predicted_desnormalized.shape[0] > layer_to_plot:
         plt.figure(figsize=(8, 7))
-        plt.imshow(dbz_predicted_desnormalized[layer_to_plot, :, :], origin='lower', cmap='jet') # 'jet' es un cmap estándar
+        plt.imshow(dbz_predicted_desnormalized[layer_to_plot, :, :], origin='lower', cmap='jet', vmin=0, vmax=60)
         plt.title(f"Predicción (Capa Z={layer_to_plot}) - {current_prediction_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
         plt.colorbar(label="dBZ")
         plt.tight_layout()
         plt.show()
     else:
         print(f"No se puede graficar la capa {layer_to_plot}, solo hay {dbz_predicted_desnormalized.shape[0]} capas.")
-
     print("Script de inferencia finalizado.")
