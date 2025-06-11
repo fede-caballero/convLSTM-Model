@@ -1,0 +1,11 @@
+NcGeneric2Mdv es la herramienta adecuada para la creación de archivos MDV en vez de NetCDF2Mdv. Los resultados obtenidos fueron satisfactorios con un archivo de params bastante sencillo y con algunas modificaciones en el codigo para la generación del NetCDF de salida del modelo. Pude filtar de forma efectiva los pixeles por debajo de un umbral y es completamente configurable para que se ignoren valores muy bajos y así evitar el ruido en la imagen.
+Los problemas que tenía no eran del modelo, en cuanto a su capacidad de predicción (aunque voy a aumentar su capacidad con hidden_dims a 128), sino que cuando convertía los nc de salida del modelo a mdv usando NetCDF2Mdv, los FillValue eran malinterpretados y se creaba un velo de DBZ que recubría a los píxeles debajo de cierto umbral.
+Cambiando de herramienta, mejoró notablemente la conversión, mostrando valores de píxeles muy cercanos a los del mdv real. Por ahora, es un rotundo éxito. Queda por delante:
+1. Aumentar las hidden dims
+2. Aumentar el salto hacia adelante, hasta el 5to escaneo al futuro.
+3. Manejar de forma automatizada la conversión de mdv a netCDF a medida que entran a la carpeta
+4. Crear un buffer que espere la entrada de 12 archivos a la carpeta y se active el modelo para generar las predicciones
+5. Cuando se obtengan las predicciones, convertirlas de forma automática a mdv con su nombre adecuado.
+6. Representar las predicciones en titan.
+
+Entonces se concluye que NetCDF2Mdv no se va a usar en futuras conversiones.

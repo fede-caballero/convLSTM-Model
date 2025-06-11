@@ -134,18 +134,17 @@ if __name__ == "__main__":
 
     # --- Ejemplo 1: Comparar dos carpetas ---
     # Asegúrate de que los archivos dentro de las carpetas estén ordenados de la misma manera.
-    path_carpeta_original = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/netcdf_500x500x18/20100102/201001021'
-    path_carpeta_normalizada = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/netcdf_500x500x18/standardized/20100102/201001021'
-    
+    path_carpeta_original = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/500x500x18_diff_scale/20150105/201501051'
+    path_carpeta_normalizada = '/home/f-caballero/UM/TIF3/convLSTM-project/convLSTM-Model/netCDF_samples/netCDF_Big_sample/netcdf_500x500x18/standardized/201501051'
     # Descomenta la siguiente línea para usar la comparación de carpetas
-    compare_data(path_carpeta_original, path_carpeta_normalizada)
+    #compare_data(path_carpeta_original, path_carpeta_normalizada)
 
     # --- Ejemplo 2: Comparar dos archivos específicos ---
-    path_archivo_original = '/ruta/a/tu/archivo_original.nc'
-    path_archivo_normalizado = '/ruta/a/tu/archivo_normalizado.nc'
+    path_archivo_original = '/home/f-caballero/UM/TIF3/convLSTM-project/Modificaciones_modelo/Modelo_080625/New_model-5/pred_t+3min_20070321_184248_sample0 (1).nc'
+    path_archivo_normalizado = '/home/f-caballero/UM/TIF3/convLSTM-project/Modificaciones_modelo/Modelo_080625/predictions/pred_t+15min_20071201_155513_sample3.nc'
     
     # Descomenta la siguiente línea para usar la comparación de archivos
-    # compare_data(path_archivo_original, path_archivo_normalizado)
+    compare_data(path_archivo_original, path_archivo_normalizado)
 
     print("Script listo. Edita las rutas en la sección '__main__' para ejecutar la comparación.")
     # Pequeña verificación para guiar al usuario

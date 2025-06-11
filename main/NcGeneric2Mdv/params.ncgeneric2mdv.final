@@ -1,0 +1,29 @@
+//==================================================================
+// Parámetros FINALES Y COMPLETOS para NcGeneric2Mdv
+//==================================================================
+
+// El modo FILELIST nos permite pasar el archivo de entrada desde la terminal.
+mode = FILELIST;
+
+// --- Manejo del Tiempo (CRÍTICO) ---
+// Le decimos a la herramienta que NO busque un 'base_time'
+// y que el tiempo absoluto está en nuestra variable 'time'.
+netcdf_var_base_time = "none";
+netcdf_var_time_offset = "time";
+
+// --- Proyección de ENTRADA (CRÍTICO) ---
+// Especificamos que nuestro NetCDF usa una grilla cartesiana.
+input_projection = PROJ_FLAT;
+input_proj_origin_lat = -34.6479988;
+input_proj_origin_lon = -68.0169982;
+
+// --- Ubicación de SALIDA ---
+// La herramienta creará un archivo binario en esta ruta.
+output_url = "/home/f-caballero/UM/TIF3/convLSTM-project/Modificaciones_modelo/Modelo_080625/New_model-8/Pruebas_para_NcGeneric/mdv_output/prediccion_final.mdv";
+
+// --- Codificación de SALIDA ---
+// La herramienta empaquetará nuestros floats a int8.
+output_encoding_type = ENCODING_INT8;
+
+// --- Depuración ---
+debug = DEBUG_VERBOSE;

@@ -20,9 +20,9 @@ if [ ${#CARPETAS[@]} -eq 0 ]; then
     exit 1
 fi
 
-# Mover archivos en grupos de 25
+# Mover archivos en grupos de 17
 for ((i=0; i<NUM_FILES; i++)); do
-    FOLDER_IDX=$((i / 25))
+    FOLDER_IDX=$((i / 17))
     if [ $FOLDER_IDX -ge ${#CARPETAS[@]} ]; then
         echo "No hay suficientes carpetas. Quedan archivos sin mover."
         break
