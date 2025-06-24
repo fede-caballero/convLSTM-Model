@@ -50,8 +50,8 @@ def crear_carpetas_mdv(ruta_base):
         print(f"Creada carpeta {nueva_carpeta}")
 
 def main():
-    campaña = "2007"
-    carpeta_base = "20071201"
+    campaña = "2008"
+    carpeta_base = "classified/20080214"
     ruta_especifica = f"/home/f-caballero/UM/TIF3/MDV_para_25_50050018/netCDF/{campaña}/{carpeta_base}"
 
 
